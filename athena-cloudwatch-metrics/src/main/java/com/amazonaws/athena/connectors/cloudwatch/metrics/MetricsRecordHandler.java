@@ -62,6 +62,7 @@ import java.util.concurrent.TimeoutException;
 import static com.amazonaws.athena.connector.lambda.data.FieldResolver.DEFAULT;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricsExceptionFilter.EXCEPTION_FILTER;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricsMetadataHandler.STATISTICS;
+import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.ACCOUNT_ID_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSIONS_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_VALUE_FIELD;
@@ -213,6 +214,7 @@ public class MetricsRecordHandler
         String prevToken;
         ValueSet dimensionNameConstraint = request.getConstraints().getSummary().get(DIMENSION_NAME_FIELD);
         ValueSet dimensionValueConstraint = request.getConstraints().getSummary().get(DIMENSION_VALUE_FIELD);
+        ValueSet accountConstraint = request.getConstraints().getSummary().get(ACCOUNT_ID_FIELD);
         do {
             prevToken = dataRequest.getNextToken();
             GetMetricDataResult result = invoker.invoke(() -> metrics.getMetricData(dataRequest));
@@ -263,6 +265,8 @@ public class MetricsRecordHandler
                         block.offerValue(VALUE_FIELD, row, values.get(sampleNum));
                         long timestamp = timestamps.get(sampleNum).getTime() / 1000;
                         block.offerValue(TIMESTAMP_FIELD, row, timestamp);
+
+                        block.offerValue(ACCOUNT_ID_FIELD, row, accountConstraint.getSingleValue());
 
                         return matches ? 1 : 0;
                     });

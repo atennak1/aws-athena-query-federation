@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,12 +57,14 @@ public class MetricsTable
                 .addStringField(DIMENSION_NAME_FIELD)
                 .addStringField(DIMENSION_VALUE_FIELD)
                 .addListField(STATISTIC_FIELD, Types.MinorType.VARCHAR.getType())
+                .addStringField(ACCOUNT_ID_FIELD)
                 .addMetadata(NAMESPACE_FIELD, "Metric namespace")
                 .addMetadata(METRIC_NAME_FIELD, "Metric name")
                 .addMetadata(STATISTIC_FIELD, "List of statistics available for this metric (e.g. Maximum, Minimum, Average, Sample Count)")
                 .addMetadata(DIMENSIONS_FIELD, "Array of Dimensions for the given metric.")
                 .addMetadata(DIMENSION_NAME_FIELD, "Shortcut field that flattens dimension to allow easier filtering for metrics that contain the dimension name. This field is left blank unless used in the where clause.")
                 .addMetadata(DIMENSION_VALUE_FIELD, "Shortcut field that flattens  dimension to allow easier filtering for metrics that contain the dimension value. This field is left blank unless used in the where clause.")
+                .addMetadata(ACCOUNT_ID_FIELD, "Owning account for the metric")
                 .build();
 
         name = "metrics";

@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.ACCOUNT_ID_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_VALUE_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.METRIC_NAME_FIELD;
@@ -114,6 +115,12 @@ public class MetricUtils
             listMetricsRequest.setMetricName(metricConstraint.getSingleValue().toString());
         }
 
+        ValueSet accountConstraint = summary.get(ACCOUNT_ID_FIELD);
+        if (accountConstraint != null && accountConstraint.isSingleValue()) {
+            listMetricsRequest.setIncludeLinkedAccounts(true);
+            listMetricsRequest.setOwningAccount(accountConstraint.getSingleValue().toString());
+        }
+
         ValueSet dimensionNameConstraint = summary.get(DIMENSION_NAME_FIELD);
         ValueSet dimensionValueConstraint = summary.get(DIMENSION_VALUE_FIELD);
         if (dimensionNameConstraint != null && dimensionNameConstraint.isSingleValue() &&
@@ -141,10 +148,12 @@ public class MetricUtils
         metric.setNamespace(split.getProperty(NAMESPACE_FIELD));
         metric.setMetricName(split.getProperty(METRIC_NAME_FIELD));
 
+        ValueSet accountConstraint = readRecordsRequest.getConstraints().getSummary().get(ACCOUNT_ID_FIELD);
+
         List<MetricDataQuery> metricDataQueries = new ArrayList<>();
         int metricId = 1;
         for (MetricStat nextMetricStat : metricStats) {
-            metricDataQueries.add(new MetricDataQuery().withMetricStat(nextMetricStat).withId("m" + metricId++));
+            metricDataQueries.add(new MetricDataQuery().withMetricStat(nextMetricStat).withId("m" + metricId++).withAccountId(accountConstraint.getSingleValue().toString()));
         }
 
         dataRequest.withMetricDataQueries(metricDataQueries);
