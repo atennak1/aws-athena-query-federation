@@ -109,6 +109,8 @@ public class MetricsMetadataHandler
 
     private final AmazonCloudWatch metrics;
 
+    private final boolean includeLinkedAccountsByDefault;
+
     static {
         //The statistics supported by Cloudwatch Metrics by default
         STATISTICS.add("Average");
@@ -135,6 +137,7 @@ public class MetricsMetadataHandler
         super(SOURCE_TYPE, configOptions);
         this.metrics = AmazonCloudWatchClientBuilder.standard().build();
         this.invoker = ThrottlingInvoker.newDefaultBuilder(EXCEPTION_FILTER, configOptions).build();
+        this.includeLinkedAccountsByDefault = MetricUtils.isIncludeLinkedAccountsByDefault();
     }
 
     @VisibleForTesting
@@ -150,6 +153,7 @@ public class MetricsMetadataHandler
         super(keyFactory, secretsManager, athena, SOURCE_TYPE, spillBucket, spillPrefix, configOptions);
         this.metrics = metrics;
         this.invoker = ThrottlingInvoker.newDefaultBuilder(EXCEPTION_FILTER, configOptions).build();
+        this.includeLinkedAccountsByDefault = MetricUtils.isIncludeLinkedAccountsByDefault();
     }
 
     /**
@@ -235,7 +239,7 @@ public class MetricsMetadataHandler
         try (ConstraintEvaluator constraintEvaluator = new ConstraintEvaluator(blockAllocator,
                 METRIC_DATA_TABLE.getSchema(),
                 getSplitsRequest.getConstraints())) {
-            ListMetricsRequest listMetricsRequest = new ListMetricsRequest();
+            ListMetricsRequest listMetricsRequest = new ListMetricsRequest().withIncludeLinkedAccounts(includeLinkedAccountsByDefault);
             MetricUtils.pushDownPredicate(getSplitsRequest.getConstraints(), listMetricsRequest);
             listMetricsRequest.setNextToken(getSplitsRequest.getContinuationToken());
 

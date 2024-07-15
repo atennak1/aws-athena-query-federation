@@ -42,7 +42,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.ACCOUNT_ID_FIELD;
+import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.OWNING_ACCOUNT_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_VALUE_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.METRIC_NAME_FIELD;
@@ -59,6 +59,8 @@ public class MetricUtils
 
     //this is a format required by Cloudwatch Metrics
     private static final String METRIC_ID = "m1";
+    //
+    private static final String INCLUDE_LINKED_ACCOUNTS_BY_DEFAULT = "include_linked_accounts_by_default";
 
     private MetricUtils() {}
 
@@ -115,7 +117,7 @@ public class MetricUtils
             listMetricsRequest.setMetricName(metricConstraint.getSingleValue().toString());
         }
 
-        ValueSet accountConstraint = summary.get(ACCOUNT_ID_FIELD);
+        ValueSet accountConstraint = summary.get(OWNING_ACCOUNT_FIELD);
         if (accountConstraint != null && accountConstraint.isSingleValue()) {
             listMetricsRequest.setIncludeLinkedAccounts(true);
             listMetricsRequest.setOwningAccount(accountConstraint.getSingleValue().toString());
@@ -148,7 +150,7 @@ public class MetricUtils
         metric.setNamespace(split.getProperty(NAMESPACE_FIELD));
         metric.setMetricName(split.getProperty(METRIC_NAME_FIELD));
 
-        ValueSet accountConstraint = readRecordsRequest.getConstraints().getSummary().get(ACCOUNT_ID_FIELD);
+        ValueSet accountConstraint = readRecordsRequest.getConstraints().getSummary().get(OWNING_ACCOUNT_FIELD);
 
         List<MetricDataQuery> metricDataQueries = new ArrayList<>();
         int metricId = 1;
@@ -197,5 +199,9 @@ public class MetricUtils
         }
 
         return dataRequest;
+    }
+
+    public static boolean isIncludeLinkedAccountsByDefault() {
+        return "true".equals(System.getenv(INCLUDE_LINKED_ACCOUNTS_BY_DEFAULT));
     }
 }

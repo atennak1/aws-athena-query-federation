@@ -57,14 +57,14 @@ public class MetricsTable
                 .addStringField(DIMENSION_NAME_FIELD)
                 .addStringField(DIMENSION_VALUE_FIELD)
                 .addListField(STATISTIC_FIELD, Types.MinorType.VARCHAR.getType())
-                .addStringField(ACCOUNT_ID_FIELD)
+                .addStringField(OWNING_ACCOUNT_FIELD)
                 .addMetadata(NAMESPACE_FIELD, "Metric namespace")
                 .addMetadata(METRIC_NAME_FIELD, "Metric name")
                 .addMetadata(STATISTIC_FIELD, "List of statistics available for this metric (e.g. Maximum, Minimum, Average, Sample Count)")
                 .addMetadata(DIMENSIONS_FIELD, "Array of Dimensions for the given metric.")
                 .addMetadata(DIMENSION_NAME_FIELD, "Shortcut field that flattens dimension to allow easier filtering for metrics that contain the dimension name. This field is left blank unless used in the where clause.")
                 .addMetadata(DIMENSION_VALUE_FIELD, "Shortcut field that flattens  dimension to allow easier filtering for metrics that contain the dimension value. This field is left blank unless used in the where clause.")
-                .addMetadata(ACCOUNT_ID_FIELD, "Owning account for the metric")
+                .addMetadata(OWNING_ACCOUNT_FIELD, "Owning account for the metric")
                 .build();
 
         name = "metrics";

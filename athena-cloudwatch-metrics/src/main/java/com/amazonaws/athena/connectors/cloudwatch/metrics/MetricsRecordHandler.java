@@ -62,7 +62,7 @@ import java.util.concurrent.TimeoutException;
 import static com.amazonaws.athena.connector.lambda.data.FieldResolver.DEFAULT;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricsExceptionFilter.EXCEPTION_FILTER;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricsMetadataHandler.STATISTICS;
-import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.ACCOUNT_ID_FIELD;
+import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.OWNING_ACCOUNT_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSIONS_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_VALUE_FIELD;
@@ -103,6 +103,8 @@ public class MetricsRecordHandler
     private final AmazonS3 amazonS3;
     private final AmazonCloudWatch metrics;
 
+    private final boolean includeLinkedAccountsByDefault;
+
     public MetricsRecordHandler(java.util.Map<String, String> configOptions)
     {
         this(AmazonS3ClientBuilder.defaultClient(),
@@ -121,6 +123,7 @@ public class MetricsRecordHandler
             .withInitialDelayMs(THROTTLING_INITIAL_DELAY)
             .withIncrease(THROTTLING_INCREMENTAL_INCREASE)
             .build();
+        this.includeLinkedAccountsByDefault = MetricUtils.isIncludeLinkedAccountsByDefault();
     }
 
     /**
@@ -147,7 +150,7 @@ public class MetricsRecordHandler
     private void readMetricsWithConstraint(BlockSpiller blockSpiller, ReadRecordsRequest request, QueryStatusChecker queryStatusChecker)
             throws TimeoutException
     {
-        ListMetricsRequest listMetricsRequest = new ListMetricsRequest();
+        ListMetricsRequest listMetricsRequest = new ListMetricsRequest().withIncludeLinkedAccounts(includeLinkedAccountsByDefault);
         MetricUtils.pushDownPredicate(request.getConstraints(), listMetricsRequest);
         String prevToken;
         Set<String> requiredFields = new HashSet<>();
@@ -214,7 +217,8 @@ public class MetricsRecordHandler
         String prevToken;
         ValueSet dimensionNameConstraint = request.getConstraints().getSummary().get(DIMENSION_NAME_FIELD);
         ValueSet dimensionValueConstraint = request.getConstraints().getSummary().get(DIMENSION_VALUE_FIELD);
-        ValueSet accountConstraint = request.getConstraints().getSummary().get(ACCOUNT_ID_FIELD);
+        ValueSet accountConstraint = request.getConstraints().getSummary().get(OWNING_ACCOUNT_FIELD);
+        String accountId = accountConstraint != null ? accountConstraint.getSingleValue().toString() : request.getIdentity().getAccount();
         do {
             prevToken = dataRequest.getNextToken();
             GetMetricDataResult result = invoker.invoke(() -> metrics.getMetricData(dataRequest));
@@ -266,7 +270,7 @@ public class MetricsRecordHandler
                         long timestamp = timestamps.get(sampleNum).getTime() / 1000;
                         block.offerValue(TIMESTAMP_FIELD, row, timestamp);
 
-                        block.offerValue(ACCOUNT_ID_FIELD, row, accountConstraint == null ? null : accountConstraint.getSingleValue());
+                        block.offerValue(OWNING_ACCOUNT_FIELD, row, accountId);
 
                         return matches ? 1 : 0;
                     });
