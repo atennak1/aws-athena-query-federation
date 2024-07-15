@@ -42,11 +42,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.OWNING_ACCOUNT_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_VALUE_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.METRIC_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.NAMESPACE_FIELD;
+import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.OWNING_ACCOUNT_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.STATISTIC_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.TIMESTAMP_FIELD;
 
@@ -201,7 +201,8 @@ public class MetricUtils
         return dataRequest;
     }
 
-    public static boolean isIncludeLinkedAccountsByDefault() {
+    public static boolean isIncludeLinkedAccountsByDefault()
+    {
         return "true".equals(System.getenv(INCLUDE_LINKED_ACCOUNTS_BY_DEFAULT));
     }
 }
