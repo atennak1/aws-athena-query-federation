@@ -266,7 +266,7 @@ public class MetricsRecordHandler
                         long timestamp = timestamps.get(sampleNum).getTime() / 1000;
                         block.offerValue(TIMESTAMP_FIELD, row, timestamp);
 
-                        block.offerValue(ACCOUNT_ID_FIELD, row, accountConstraint.getSingleValue());
+                        block.offerValue(ACCOUNT_ID_FIELD, row, accountConstraint == null ? null : accountConstraint.getSingleValue());
 
                         return matches ? 1 : 0;
                     });
