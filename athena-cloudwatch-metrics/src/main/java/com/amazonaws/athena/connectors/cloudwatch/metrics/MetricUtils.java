@@ -153,7 +153,8 @@ public class MetricUtils
         List<MetricDataQuery> metricDataQueries = new ArrayList<>();
         int metricId = 1;
         for (MetricStat nextMetricStat : metricStats) {
-            metricDataQueries.add(new MetricDataQuery().withMetricStat(nextMetricStat).withId("m" + metricId++).withAccountId(accountConstraint.getSingleValue().toString()));
+            metricDataQueries.add(new MetricDataQuery().withMetricStat(nextMetricStat).withId("m" + metricId++)
+            .withAccountId(accountConstraint != null ? accountConstraint.getSingleValue().toString() : null));
         }
 
         dataRequest.withMetricDataQueries(metricDataQueries);

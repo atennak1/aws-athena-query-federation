@@ -157,7 +157,7 @@ public class MetricsMetadataHandlerTest
 
         assertEquals(new TableName(defaultSchema, "metrics"), metricsTableRes.getTableName());
         assertNotNull(metricsTableRes.getSchema());
-        assertEquals(6, metricsTableRes.getSchema().getFields().size());
+        assertEquals(7, metricsTableRes.getSchema().getFields().size());
 
         logger.info("doGetMetricsTable - exit");
     }
@@ -177,7 +177,7 @@ public class MetricsMetadataHandlerTest
 
         assertEquals(new TableName(defaultSchema, "metric_samples"), metricsTableRes.getTableName());
         assertNotNull(metricsTableRes.getSchema());
-        assertEquals(9, metricsTableRes.getSchema().getFields().size());
+        assertEquals(10, metricsTableRes.getSchema().getFields().size());
 
         logger.info("doGetMetricSamplesTable - exit");
     }
