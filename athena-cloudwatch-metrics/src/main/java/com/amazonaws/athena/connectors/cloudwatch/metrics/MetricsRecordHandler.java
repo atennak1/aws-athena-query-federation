@@ -157,6 +157,8 @@ public class MetricsRecordHandler
         request.getSchema().getFields().stream().forEach(next -> requiredFields.add(next.getName()));
         ValueSet dimensionNameConstraint = request.getConstraints().getSummary().get(DIMENSION_NAME_FIELD);
         ValueSet dimensionValueConstraint = request.getConstraints().getSummary().get(DIMENSION_VALUE_FIELD);
+        ValueSet accountConstraint = request.getConstraints().getSummary().get(OWNING_ACCOUNT_FIELD);
+        String accountId = accountConstraint != null ? accountConstraint.getSingleValue().toString() : request.getIdentity().getAccount();
         do {
             prevToken = listMetricsRequest.getNextToken();
             ListMetricsResult result = invoker.invoke(() -> metrics.listMetrics(listMetricsRequest));
@@ -168,19 +170,21 @@ public class MetricsRecordHandler
                         matches &= block.offerValue(NAMESPACE_FIELD, row, nextMetric.getNamespace());
                         matches &= block.offerComplexValue(STATISTIC_FIELD, row, DEFAULT, STATISTICS);
 
-                        matches &= block.offerComplexValue(DIMENSIONS_FIELD,
-                                row,
-                                (Field field, Object val) -> {
-                                    if (field.getName().equals(DIMENSION_NAME_FIELD)) {
-                                        return ((Dimension) val).getName();
-                                    }
-                                    else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
-                                        return ((Dimension) val).getValue();
-                                    }
+                        if (!nextMetric.getDimensions().isEmpty()) {
+                            matches &= block.offerComplexValue(DIMENSIONS_FIELD,
+                                    row,
+                                    (Field field, Object val) -> {
+                                        if (field.getName().equals(DIMENSION_NAME_FIELD)) {
+                                            return ((Dimension) val).getName();
+                                        }
+                                        else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
+                                            return ((Dimension) val).getValue();
+                                        }
 
-                                    throw new RuntimeException("Unexpected field " + field.getName());
-                                },
-                                nextMetric.getDimensions());
+                                        throw new RuntimeException("Unexpected field " + field.getName());
+                                    },
+                                    nextMetric.getDimensions());
+                        }
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
@@ -193,6 +197,8 @@ public class MetricsRecordHandler
                         String dimValue = (dimensionValueConstraint == null || !dimensionValueConstraint.isSingleValue())
                                 ? null : dimensionValueConstraint.getSingleValue().toString();
                         matches &= block.offerValue(DIMENSION_VALUE_FIELD, row, dimValue);
+
+                        matches &= block.offerValue(OWNING_ACCOUNT_FIELD, row, accountId);
                     }
                     return matches ? 1 : 0;
                 });
