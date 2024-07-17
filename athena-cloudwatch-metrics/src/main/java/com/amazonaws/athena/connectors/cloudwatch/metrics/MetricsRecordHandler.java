@@ -229,6 +229,7 @@ public class MetricsRecordHandler
         do {
             prevToken = dataRequest.getNextToken();
             GetMetricDataResult result = invoker.invoke(() -> metrics.getMetricData(dataRequest));
+            logger.debug(result.toString());
             for (MetricDataResult nextMetric : result.getMetricDataResults()) {
                 MetricStat metricStat = queries.get(nextMetric.getId()).getMetricStat();
                 List<Date> timestamps = nextMetric.getTimestamps();
