@@ -246,6 +246,7 @@ public class MetricsMetadataHandler
             String period = getPeriodFromConstraint(getSplitsRequest.getConstraints());
             Set<Split> splits = new HashSet<>();
             ListMetricsResult result = invoker.invoke(() -> metrics.listMetrics(listMetricsRequest));
+            logger.debug(result.toString());
 
             List<MetricStat> metricStats = new ArrayList<>(100);
             for (Metric nextMetric : result.getMetrics()) {
@@ -261,6 +262,7 @@ public class MetricsMetadataHandler
                     }
                 }
             }
+            logger.debug(metricStats.toString());
 
             if (CollectionUtils.isNullOrEmpty(metricStats)) {
                 logger.info("No metric stats present after filtering predicates.");
