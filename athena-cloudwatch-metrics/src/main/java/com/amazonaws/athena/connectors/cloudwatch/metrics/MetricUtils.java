@@ -146,9 +146,6 @@ public class MetricUtils
         String serializedMetricStats = split.getProperty(MetricStatSerDe.SERIALIZED_METRIC_STATS_FIELD_NAME);
         List<MetricStat> metricStats = MetricStatSerDe.deserialize(serializedMetricStats);
         GetMetricDataRequest dataRequest = new GetMetricDataRequest();
-        com.amazonaws.services.cloudwatch.model.Metric metric = new com.amazonaws.services.cloudwatch.model.Metric();
-        metric.setNamespace(split.getProperty(NAMESPACE_FIELD));
-        metric.setMetricName(split.getProperty(METRIC_NAME_FIELD));
 
         ValueSet accountConstraint = readRecordsRequest.getConstraints().getSummary().get(OWNING_ACCOUNT_FIELD);
 

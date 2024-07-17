@@ -215,6 +215,7 @@ public class MetricsRecordHandler
             throws TimeoutException
     {
         GetMetricDataRequest dataRequest = MetricUtils.makeGetMetricDataRequest(request);
+        logger.debug(dataRequest.toString());
         Map<String, MetricDataQuery> queries = new HashMap<>();
         for (MetricDataQuery query : dataRequest.getMetricDataQueries()) {
             queries.put(query.getId(), query);
