@@ -245,19 +245,21 @@ public class MetricsRecordHandler
                         block.offerValue(NAMESPACE_FIELD, row, metricStat.getMetric().getNamespace());
                         block.offerValue(STATISTIC_FIELD, row, metricStat.getStat());
 
-                        block.offerComplexValue(DIMENSIONS_FIELD,
-                                row,
-                                (Field field, Object val) -> {
-                                    if (field.getName().equals(DIMENSION_NAME_FIELD)) {
-                                        return ((Dimension) val).getName();
-                                    }
-                                    else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
-                                        return ((Dimension) val).getValue();
-                                    }
+                        if (!metricStat.getMetric().getDimensions().isEmpty()) {
+                            block.offerComplexValue(DIMENSIONS_FIELD,
+                                    row,
+                                    (Field field, Object val) -> {
+                                        if (field.getName().equals(DIMENSION_NAME_FIELD)) {
+                                            return ((Dimension) val).getName();
+                                        }
+                                        else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
+                                            return ((Dimension) val).getValue();
+                                        }
 
-                                    throw new RuntimeException("Unexpected field " + field.getName());
-                                },
-                                metricStat.getMetric().getDimensions());
+                                        throw new RuntimeException("Unexpected field " + field.getName());
+                                    },
+                                    metricStat.getMetric().getDimensions());
+                        }
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
