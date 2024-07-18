@@ -342,7 +342,7 @@ public class MetricsRecordHandlerTest
                 values.add(j);
                 timestamps.add(new Date(System.currentTimeMillis() + (int) j));
             }
-            samples.add(new MetricDataResult().withValues(values).withTimestamps(timestamps).withId("m1"));
+            samples.add(new MetricDataResult().withValues(values).withTimestamps(timestamps).withId("m0"));
         }
 
         return new GetMetricDataResult().withNextToken(nextToken).withMetricDataResults(samples);
