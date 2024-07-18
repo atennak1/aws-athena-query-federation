@@ -21,6 +21,7 @@ package com.amazonaws.athena.connectors.cloudwatch.metrics;
 
 import com.amazonaws.services.cloudwatch.model.Dimension;
 import com.amazonaws.services.cloudwatch.model.Metric;
+import com.amazonaws.services.cloudwatch.model.MetricDataQuery;
 import com.amazonaws.services.cloudwatch.model.MetricStat;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -51,18 +52,21 @@ public class MetricStatSerDeTest
         dimensions.add(new Dimension().withName("dim_name1").withValue("dim_value1"));
         dimensions.add(new Dimension().withName("dim_name2").withValue("dim_value2"));
 
-        List<MetricStat> metricStats = new ArrayList<>();
-        metricStats.add(new MetricStat()
-                .withMetric(new Metric()
-                        .withNamespace(namespace)
-                        .withMetricName(metricName)
-                        .withDimensions(dimensions))
-                .withPeriod(60)
-                .withStat(statistic));
-        String actualSerialization = MetricDataQuerySerDe.serialize(metricStats);
+        List<MetricDataQuery> metricDataQueries = new ArrayList<>();
+        metricDataQueries.add(new MetricDataQuery()
+                .withMetricStat(new MetricStat()
+                        .withMetric(new Metric()
+                                .withNamespace(namespace)
+                                .withMetricName(metricName)
+                                .withDimensions(dimensions))
+                        .withPeriod(60)
+                        .withStat(statistic))
+                .withId("m0")
+                .withAccountId(null));
+        String actualSerialization = MetricDataQuerySerDe.serialize(metricDataQueries);
         logger.info("serializeTest: {}", actualSerialization);
-        List<MetricStat> actual = MetricDataQuerySerDe.deserialize(actualSerialization);
+        List<MetricDataQuery> actual = MetricDataQuerySerDe.deserialize(actualSerialization);
         assertEquals(EXPECTED_SERIALIZATION, actualSerialization);
-        assertEquals(metricStats, actual);
+        assertEquals(metricDataQueries, actual);
     }
 }

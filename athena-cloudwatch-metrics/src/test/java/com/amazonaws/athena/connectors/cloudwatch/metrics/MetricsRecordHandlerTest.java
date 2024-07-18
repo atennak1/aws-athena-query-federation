@@ -269,18 +269,20 @@ public class MetricsRecordHandlerTest
                 .withIsDirectory(true)
                 .build();
 
-        List<MetricStat> metricStats = new ArrayList<>();
-        metricStats.add(new MetricStat()
-                .withMetric(new Metric()
-                        .withNamespace(namespace)
-                        .withMetricName(metricName)
-                        .withDimensions(dimensions))
-                .withPeriod(60)
-                .withStat(statistic));
+        List<MetricDataQuery> metricDataQueries = new ArrayList<>();
+        metricDataQueries.add(new MetricDataQuery()
+                .withMetricStat(new MetricStat()
+                        .withMetric(new Metric()
+                                .withNamespace(namespace)
+                                .withMetricName(metricName)
+                                .withDimensions(dimensions))
+                        .withPeriod(60)
+                        .withStat(statistic))
+                .withId("m0")
+                .withAccountId(null));
 
         Split split = Split.newBuilder(spillLocation, keyFactory.create())
-                .add(MetricDataQuerySerDe.SERIALIZED_METRIC_STATS_FIELD_NAME, MetricDataQuerySerDe.serialize(metricStats))
-                .add(METRIC_NAME_FIELD, metricName)
+                .add(MetricDataQuerySerDe.SERIALIZED_METRIC_DATA_QUERIES_FIELD_NAME, MetricDataQuerySerDe.serialize(metricDataQueries))
                 .add(NAMESPACE_FIELD, namespace)
                 .add(STATISTIC_FIELD, statistic)
                 .add(PERIOD_FIELD, period)

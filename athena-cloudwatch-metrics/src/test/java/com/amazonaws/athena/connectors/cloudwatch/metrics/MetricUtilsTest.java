@@ -36,6 +36,7 @@ import com.amazonaws.services.cloudwatch.model.DimensionFilter;
 import com.amazonaws.services.cloudwatch.model.GetMetricDataRequest;
 import com.amazonaws.services.cloudwatch.model.ListMetricsRequest;
 import com.amazonaws.services.cloudwatch.model.Metric;
+import com.amazonaws.services.cloudwatch.model.MetricDataQuery;
 import com.amazonaws.services.cloudwatch.model.MetricStat;
 import org.apache.arrow.vector.types.pojo.Schema;
 import com.google.common.collect.ImmutableList;
@@ -50,7 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricDataQuerySerDe.SERIALIZED_METRIC_STATS_FIELD_NAME;
+import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricDataQuerySerDe.SERIALIZED_METRIC_DATA_QUERIES_FIELD_NAME;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.TestUtils.makeStringEquals;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_VALUE_FIELD;
@@ -162,21 +163,24 @@ public class MetricUtilsTest
         dimensions.add(new Dimension().withName("dim_name1").withValue("dim_value1"));
         dimensions.add(new Dimension().withName("dim_name2").withValue("dim_value2"));
 
-        List<MetricStat> metricStats = new ArrayList<>();
-        metricStats.add(new MetricStat()
-                .withMetric(new Metric()
-                        .withNamespace(namespace)
-                        .withMetricName(metricName)
-                        .withDimensions(dimensions))
-                .withPeriod(60)
-                .withStat(statistic));
+        List<MetricDataQuery> metricDataQueries = new ArrayList<>();
+        metricDataQueries.add(new MetricDataQuery()
+                .withMetricStat(new MetricStat()
+                        .withMetric(new Metric()
+                                .withNamespace(namespace)
+                                .withMetricName(metricName)
+                                .withDimensions(dimensions))
+                        .withPeriod(60)
+                        .withStat(statistic))
+                .withId("m0")
+                .withAccountId(null));
 
         Split split = Split.newBuilder(null, null)
                 .add(NAMESPACE_FIELD, namespace)
                 .add(METRIC_NAME_FIELD, metricName)
                 .add(PERIOD_FIELD, String.valueOf(period))
                 .add(STATISTIC_FIELD, statistic)
-                .add(SERIALIZED_METRIC_STATS_FIELD_NAME, MetricDataQuerySerDe.serialize(metricStats))
+                .add(SERIALIZED_METRIC_DATA_QUERIES_FIELD_NAME, MetricDataQuerySerDe.serialize(metricDataQueries))
                 .build();
 
         Schema schemaForRead = SchemaBuilder.newBuilder().addStringField(METRIC_NAME_FIELD).build();
