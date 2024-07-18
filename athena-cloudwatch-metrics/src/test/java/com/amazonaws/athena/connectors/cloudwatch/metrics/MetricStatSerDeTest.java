@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 public class MetricStatSerDeTest
 {
     private static final Logger logger = LoggerFactory.getLogger(MetricStatSerDeTest.class);
-    private static final String EXPECTED_SERIALIZATION = "{\"metricDataQueries\":[{\"id\":\"m0\",\"metricStat\":{\"metric\":{\"namespace\":\"namespace\"," +
+    private static final String EXPECTED_SERIALIZATION = "{\"metricDataQueries\":[{\"id\":\"m1\",\"metricStat\":{\"metric\":{\"namespace\":\"namespace\"," +
             "\"metricName\":\"metricName\",\"dimensions\":[{\"name\":\"dim_name1\",\"value\":\"dim_value1\"},{\"name\":\"dim_name2\",\"value\":\"dim_value2\"}]}," +
             "\"period\":60,\"stat\":\"p90\",\"unit\":null},\"expression\":null,\"label\":null,\"returnData\":null,\"period\":null,\"accountId\":null}]}";
 
@@ -62,7 +62,7 @@ public class MetricStatSerDeTest
                                 .withDimensions(dimensions))
                         .withPeriod(60)
                         .withStat(statistic))
-                .withId("m0")
+                .withId("m1")
                 .withAccountId(null));
         String actualSerialization = MetricDataQuerySerDe.serialize(metricDataQueries);
         logger.info("serializeTest: {}", actualSerialization);

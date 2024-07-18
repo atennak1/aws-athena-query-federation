@@ -253,6 +253,7 @@ public class MetricsMetadataHandler
             List<MetricDataQuery> metricDataQueries = new ArrayList<>(100);
             List<Metric> metrics = result.getMetrics();
             List<String> accounts = result.getOwningAccounts();
+            int metricId = 1;
             for (int i = 0; i < result.getMetrics().size(); i++) {
                 Metric nextMetric = metrics.get(i);
                 for (String nextStatistic : STATISTICS) {
@@ -265,7 +266,7 @@ public class MetricsMetadataHandler
                                                 .withDimensions(nextMetric.getDimensions()))
                                         .withPeriod(Integer.valueOf(period))
                                         .withStat(nextStatistic))
-                                .withId("m" + i)
+                                .withId("m" + metricId++)
                                 .withAccountId(accounts.isEmpty() ? null : accounts.get(i)));
                     }
                 }

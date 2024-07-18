@@ -278,7 +278,7 @@ public class MetricsRecordHandlerTest
                                 .withDimensions(dimensions))
                         .withPeriod(60)
                         .withStat(statistic))
-                .withId("m0")
+                .withId("m1")
                 .withAccountId(null));
 
         Split split = Split.newBuilder(spillLocation, keyFactory.create())
@@ -323,7 +323,7 @@ public class MetricsRecordHandlerTest
         assertEquals(1, queries.size());
         MetricDataQuery query = queries.get(0);
         MetricStat stat = query.getMetricStat();
-        assertEquals("m0", query.getId());
+        assertEquals("m1", query.getId());
         assertNotNull(stat.getPeriod());
         assertNotNull(stat.getMetric());
         assertNotNull(stat.getStat());
@@ -342,7 +342,7 @@ public class MetricsRecordHandlerTest
                 values.add(j);
                 timestamps.add(new Date(System.currentTimeMillis() + (int) j));
             }
-            samples.add(new MetricDataResult().withValues(values).withTimestamps(timestamps).withId("m0"));
+            samples.add(new MetricDataResult().withValues(values).withTimestamps(timestamps).withId("m1"));
         }
 
         return new GetMetricDataResult().withNextToken(nextToken).withMetricDataResults(samples);

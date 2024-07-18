@@ -172,7 +172,7 @@ public class MetricUtilsTest
                                 .withDimensions(dimensions))
                         .withPeriod(60)
                         .withStat(statistic))
-                .withId("m0")
+                .withId("m1")
                 .withAccountId(null));
 
         Split split = Split.newBuilder(null, null)
