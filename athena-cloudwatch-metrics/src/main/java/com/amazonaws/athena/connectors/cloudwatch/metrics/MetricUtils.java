@@ -32,11 +32,9 @@ import com.amazonaws.services.cloudwatch.model.GetMetricDataRequest;
 import com.amazonaws.services.cloudwatch.model.ListMetricsRequest;
 import com.amazonaws.services.cloudwatch.model.Metric;
 import com.amazonaws.services.cloudwatch.model.MetricDataQuery;
-import com.amazonaws.services.cloudwatch.model.MetricStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
