@@ -190,13 +190,13 @@ public class MetricsRecordHandler
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
-                        String dimName = (dimensionNameConstraint == null || !dimensionNameConstraint.isSingleValue())
-                                ? null : (dimensionNameConstraint.getSingleValue().toString());
+                        String dimName = (dimensionNameConstraint == null || !dimensionNameConstraint.isSingleValue() || dimensionNameConstraint.getSingleValue() == null)
+                                ? null : dimensionNameConstraint.getSingleValue().toString();
                         matches &= block.offerValue(DIMENSION_NAME_FIELD, row, dimName);
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
-                        String dimValue = (dimensionValueConstraint == null || !dimensionValueConstraint.isSingleValue())
+                        String dimValue = (dimensionValueConstraint == null || !dimensionValueConstraint.isSingleValue() || dimensionValueConstraint.getSingleValue() == null)
                                 ? null : dimensionValueConstraint.getSingleValue().toString();
                         matches &= block.offerValue(DIMENSION_VALUE_FIELD, row, dimValue);
 
@@ -264,13 +264,13 @@ public class MetricsRecordHandler
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
-                        String dimName = (dimensionNameConstraint == null || !dimensionNameConstraint.isSingleValue())
+                        String dimName = (dimensionNameConstraint == null || !dimensionNameConstraint.isSingleValue() || dimensionNameConstraint.getSingleValue() == null)
                                 ? null : dimensionNameConstraint.getSingleValue().toString();
                         block.offerValue(DIMENSION_NAME_FIELD, row, dimName);
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
-                        String dimVal = (dimensionValueConstraint == null || !dimensionValueConstraint.isSingleValue())
+                        String dimVal = (dimensionValueConstraint == null || !dimensionValueConstraint.isSingleValue() || dimensionValueConstraint.getSingleValue() == null)
                                 ? null : dimensionValueConstraint.getSingleValue().toString();
                         block.offerValue(DIMENSION_VALUE_FIELD, row, dimVal);
 
