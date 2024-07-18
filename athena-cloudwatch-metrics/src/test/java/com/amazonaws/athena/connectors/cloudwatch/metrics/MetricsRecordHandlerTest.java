@@ -323,7 +323,7 @@ public class MetricsRecordHandlerTest
         assertEquals(1, queries.size());
         MetricDataQuery query = queries.get(0);
         MetricStat stat = query.getMetricStat();
-        assertEquals("m1", query.getId());
+        assertEquals("m0", query.getId());
         assertNotNull(stat.getPeriod());
         assertNotNull(stat.getMetric());
         assertNotNull(stat.getStat());

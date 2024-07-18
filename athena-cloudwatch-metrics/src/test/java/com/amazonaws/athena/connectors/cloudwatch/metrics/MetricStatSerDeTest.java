@@ -35,8 +35,9 @@ import static org.junit.Assert.*;
 public class MetricStatSerDeTest
 {
     private static final Logger logger = LoggerFactory.getLogger(MetricStatSerDeTest.class);
-    private static final String EXPECTED_SERIALIZATION = "{\"metricStats\":[{\"metric\":{\"namespace\":\"namespace\",\"metricName\":\"metricName\",\"dimensions\":[" +
-            "{\"name\":\"dim_name1\",\"value\":\"dim_value1\"},{\"name\":\"dim_name2\",\"value\":\"dim_value2\"}]},\"period\":60,\"stat\":\"p90\",\"unit\":null}]}";
+    private static final String EXPECTED_SERIALIZATION = "{\"metricDataQueries\":[{\"id\":\"m0\",\"metricStat\":{\"metric\":{\"namespace\":\"namespace\"" +
+            "\"metricName\":\"metricName\",\"dimensions\":[{\"name\":\"dim_name1\",\"value\":\"dim_value1\"},{\"name\":\"dim_name2\",\"value\":\"dim_value2\"}]}," +
+            "\"period\":60,\"stat\":\"p90\",\"unit\":null},\"expression\":null,\"label\":null,\"returnData\":null,\"period\":null,\"accountId\":null}]}";
 
     @Test
     public void serializeTest()
