@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricStatSerDe.SERIALIZED_METRIC_STATS_FIELD_NAME;
+import static com.amazonaws.athena.connectors.cloudwatch.metrics.MetricDataQuerySerDe.SERIALIZED_METRIC_STATS_FIELD_NAME;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.TestUtils.makeStringEquals;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_NAME_FIELD;
 import static com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table.DIMENSION_VALUE_FIELD;
@@ -176,7 +176,7 @@ public class MetricUtilsTest
                 .add(METRIC_NAME_FIELD, metricName)
                 .add(PERIOD_FIELD, String.valueOf(period))
                 .add(STATISTIC_FIELD, statistic)
-                .add(SERIALIZED_METRIC_STATS_FIELD_NAME, MetricStatSerDe.serialize(metricStats))
+                .add(SERIALIZED_METRIC_STATS_FIELD_NAME, MetricDataQuerySerDe.serialize(metricStats))
                 .build();
 
         Schema schemaForRead = SchemaBuilder.newBuilder().addStringField(METRIC_NAME_FIELD).build();

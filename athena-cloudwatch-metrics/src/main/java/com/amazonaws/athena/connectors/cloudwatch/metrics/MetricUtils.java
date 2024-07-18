@@ -125,8 +125,8 @@ public class MetricUtils
 
         ValueSet dimensionNameConstraint = summary.get(DIMENSION_NAME_FIELD);
         ValueSet dimensionValueConstraint = summary.get(DIMENSION_VALUE_FIELD);
-        if (dimensionNameConstraint != null && dimensionNameConstraint.isSingleValue() &&
-                dimensionValueConstraint != null && dimensionValueConstraint.isSingleValue()) {
+        if (dimensionNameConstraint != null && dimensionNameConstraint.isSingleValue() && dimensionNameConstraint.getSingleValue() != null &&
+                dimensionValueConstraint != null && dimensionValueConstraint.isSingleValue() && dimensionValueConstraint.getSingleValue() != null) {
             DimensionFilter filter = new DimensionFilter()
                     .withName(dimensionNameConstraint.getSingleValue().toString())
                     .withValue(dimensionValueConstraint.getSingleValue().toString());
@@ -143,18 +143,18 @@ public class MetricUtils
     protected static GetMetricDataRequest makeGetMetricDataRequest(ReadRecordsRequest readRecordsRequest)
     {
         Split split = readRecordsRequest.getSplit();
-        String serializedMetricStats = split.getProperty(MetricStatSerDe.SERIALIZED_METRIC_STATS_FIELD_NAME);
-        List<MetricStat> metricStats = MetricStatSerDe.deserialize(serializedMetricStats);
+        String serializedMetricDataQueries = split.getProperty(MetricDataQuerySerDe.SERIALIZED_METRIC_DATA_QUERIES_FIELD_NAME);
+        List<MetricDataQuery> metricDataQueries = MetricDataQuerySerDe.deserialize(serializedMetricDataQueries);
         GetMetricDataRequest dataRequest = new GetMetricDataRequest();
 
         ValueSet accountConstraint = readRecordsRequest.getConstraints().getSummary().get(OWNING_ACCOUNT_FIELD);
 
-        List<MetricDataQuery> metricDataQueries = new ArrayList<>();
-        int metricId = 1;
-        for (MetricStat nextMetricStat : metricStats) {
-            metricDataQueries.add(new MetricDataQuery().withMetricStat(nextMetricStat).withId("m" + metricId++)
-            .withAccountId(accountConstraint != null ? accountConstraint.getSingleValue().toString() : null));
-        }
+        // List<MetricDataQuery> metricDataQueries = new ArrayList<>();
+        // int metricId = 1;
+        // for (MetricStat nextMetricStat : metricStats) {
+        //     metricDataQueries.add(new MetricDataQuery().withMetricStat(nextMetricStat).withId("m" + metricId++)
+        //     .withAccountId(accountConstraint != null ? accountConstraint.getSingleValue().toString() : null));
+        // }
 
         dataRequest.withMetricDataQueries(metricDataQueries);
 

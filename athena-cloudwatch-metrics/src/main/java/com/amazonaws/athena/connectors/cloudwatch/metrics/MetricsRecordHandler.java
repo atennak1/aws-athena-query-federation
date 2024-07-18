@@ -157,12 +157,16 @@ public class MetricsRecordHandler
         request.getSchema().getFields().stream().forEach(next -> requiredFields.add(next.getName()));
         ValueSet dimensionNameConstraint = request.getConstraints().getSummary().get(DIMENSION_NAME_FIELD);
         ValueSet dimensionValueConstraint = request.getConstraints().getSummary().get(DIMENSION_VALUE_FIELD);
-        ValueSet accountConstraint = request.getConstraints().getSummary().get(OWNING_ACCOUNT_FIELD);
-        String accountId = accountConstraint != null ? accountConstraint.getSingleValue().toString() : request.getIdentity().getAccount();
+        // TODO this may be wrong if the Athena caller is in a different account
+        String impliedAccountId = request.getIdentity().getAccount();
         do {
             prevToken = listMetricsRequest.getNextToken();
             ListMetricsResult result = invoker.invoke(() -> metrics.listMetrics(listMetricsRequest));
-            for (Metric nextMetric : result.getMetrics()) {
+            List<Metric> metrics = result.getMetrics();
+            List<String> accounts = result.getOwningAccounts();
+            for (int i = 0; i < result.getMetrics().size(); i++) {
+                Metric nextMetric = metrics.get(i);
+                String accountId = accounts.isEmpty() ? impliedAccountId : accounts.get(i);
                 blockSpiller.writeRows((Block block, int row) -> {
                     boolean matches = MetricUtils.applyMetricConstraints(blockSpiller.getConstraintEvaluator(), nextMetric, null);
                     if (matches) {
@@ -170,21 +174,19 @@ public class MetricsRecordHandler
                         matches &= block.offerValue(NAMESPACE_FIELD, row, nextMetric.getNamespace());
                         matches &= block.offerComplexValue(STATISTIC_FIELD, row, DEFAULT, STATISTICS);
 
-                        if (!nextMetric.getDimensions().isEmpty()) {
-                            matches &= block.offerComplexValue(DIMENSIONS_FIELD,
-                                    row,
-                                    (Field field, Object val) -> {
-                                        if (field.getName().equals(DIMENSION_NAME_FIELD)) {
-                                            return ((Dimension) val).getName();
-                                        }
-                                        else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
-                                            return ((Dimension) val).getValue();
-                                        }
+                        matches &= block.offerComplexValue(DIMENSIONS_FIELD,
+                                row,
+                                (Field field, Object val) -> {
+                                    if (field.getName().equals(DIMENSION_NAME_FIELD)) {
+                                        return ((Dimension) val).getName();
+                                    }
+                                    else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
+                                        return ((Dimension) val).getValue();
+                                    }
 
-                                        throw new RuntimeException("Unexpected field " + field.getName());
-                                    },
-                                    nextMetric.getDimensions());
-                        }
+                                    throw new RuntimeException("Unexpected field " + field.getName());
+                                },
+                                nextMetric.getDimensions());
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
@@ -224,14 +226,15 @@ public class MetricsRecordHandler
         String prevToken;
         ValueSet dimensionNameConstraint = request.getConstraints().getSummary().get(DIMENSION_NAME_FIELD);
         ValueSet dimensionValueConstraint = request.getConstraints().getSummary().get(DIMENSION_VALUE_FIELD);
-        ValueSet accountConstraint = request.getConstraints().getSummary().get(OWNING_ACCOUNT_FIELD);
-        String accountId = accountConstraint != null ? accountConstraint.getSingleValue().toString() : request.getIdentity().getAccount();
+        // TODO this may be wrong if the Athena caller is in a different account
+        String impliedAccountId = request.getIdentity().getAccount();
         do {
             prevToken = dataRequest.getNextToken();
             GetMetricDataResult result = invoker.invoke(() -> metrics.getMetricData(dataRequest));
             logger.debug(result.toString());
             for (MetricDataResult nextMetric : result.getMetricDataResults()) {
-                MetricStat metricStat = queries.get(nextMetric.getId()).getMetricStat();
+                MetricDataQuery metricDataQuery = queries.get(nextMetric.getId());
+                MetricStat metricStat = metricDataQuery.getMetricStat();
                 List<Date> timestamps = nextMetric.getTimestamps();
                 List<Double> values = nextMetric.getValues();
                 for (int i = 0; i < nextMetric.getValues().size(); i++) {
@@ -245,21 +248,19 @@ public class MetricsRecordHandler
                         block.offerValue(NAMESPACE_FIELD, row, metricStat.getMetric().getNamespace());
                         block.offerValue(STATISTIC_FIELD, row, metricStat.getStat());
 
-                        if (!metricStat.getMetric().getDimensions().isEmpty()) {
-                            block.offerComplexValue(DIMENSIONS_FIELD,
-                                    row,
-                                    (Field field, Object val) -> {
-                                        if (field.getName().equals(DIMENSION_NAME_FIELD)) {
-                                            return ((Dimension) val).getName();
-                                        }
-                                        else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
-                                            return ((Dimension) val).getValue();
-                                        }
+                        block.offerComplexValue(DIMENSIONS_FIELD,
+                                row,
+                                (Field field, Object val) -> {
+                                    if (field.getName().equals(DIMENSION_NAME_FIELD)) {
+                                        return ((Dimension) val).getName();
+                                    }
+                                    else if (field.getName().equals(DIMENSION_VALUE_FIELD)) {
+                                        return ((Dimension) val).getValue();
+                                    }
 
-                                        throw new RuntimeException("Unexpected field " + field.getName());
-                                    },
-                                    metricStat.getMetric().getDimensions());
-                        }
+                                    throw new RuntimeException("Unexpected field " + field.getName());
+                                },
+                                metricStat.getMetric().getDimensions());
 
                         //This field is 'faked' in that we just use it as a convenient way to filter single dimensions. As such
                         //we always populate it with the value of the filter if the constraint passed and the filter was singleValue
@@ -275,14 +276,14 @@ public class MetricsRecordHandler
 
                         block.offerValue(PERIOD_FIELD, row, metricStat.getPeriod());
 
-                        boolean matches = true;
                         block.offerValue(VALUE_FIELD, row, values.get(sampleNum));
                         long timestamp = timestamps.get(sampleNum).getTime() / 1000;
                         block.offerValue(TIMESTAMP_FIELD, row, timestamp);
 
+                        String accountId = metricDataQuery.getAccountId() != null ? metricDataQuery.getAccountId() : impliedAccountId;
                         block.offerValue(OWNING_ACCOUNT_FIELD, row, accountId);
 
-                        return matches ? 1 : 0;
+                        return 1;
                     });
                 }
             }
