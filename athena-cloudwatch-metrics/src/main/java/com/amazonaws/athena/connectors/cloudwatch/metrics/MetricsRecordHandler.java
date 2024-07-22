@@ -110,7 +110,7 @@ public class MetricsRecordHandler
         this(AmazonS3ClientBuilder.defaultClient(),
                 AWSSecretsManagerClientBuilder.defaultClient(),
                 AmazonAthenaClientBuilder.defaultClient(),
-                AmazonCloudWatchClientBuilder.standard().withRegion("eu-west-1").build(), configOptions);
+                AmazonCloudWatchClientBuilder.standard().withRegion("ap-southeast-1").build(), configOptions);
     }
 
     @VisibleForTesting

@@ -136,7 +136,7 @@ public class MetricsMetadataHandler
     public MetricsMetadataHandler(java.util.Map<String, String> configOptions)
     {
         super(SOURCE_TYPE, configOptions);
-        this.metrics = AmazonCloudWatchClientBuilder.standard().withRegion("eu-west-1").build();
+        this.metrics = AmazonCloudWatchClientBuilder.standard().withRegion("ap-southeast-1").build();
         this.invoker = ThrottlingInvoker.newDefaultBuilder(EXCEPTION_FILTER, configOptions).build();
         this.includeLinkedAccountsByDefault = MetricUtils.isIncludeLinkedAccountsByDefault();
     }
