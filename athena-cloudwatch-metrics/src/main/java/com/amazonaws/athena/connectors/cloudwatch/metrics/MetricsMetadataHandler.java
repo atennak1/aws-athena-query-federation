@@ -273,9 +273,15 @@ public class MetricsMetadataHandler
             }
             logger.debug(metricDataQueries.toString());
 
+            String continuationToken = null;
+            if (result.getNextToken() != null &&
+                    !result.getNextToken().equalsIgnoreCase(listMetricsRequest.getNextToken())) {
+                continuationToken = result.getNextToken();
+            }
+
             if (CollectionUtils.isNullOrEmpty(metricDataQueries)) {
                 logger.info("No metric stats present after filtering predicates.");
-                return new GetSplitsResponse(getSplitsRequest.getCatalogName(), splits, null);
+                return new GetSplitsResponse(getSplitsRequest.getCatalogName(), splits, continuationToken);
             }
 
             List<List<MetricDataQuery>> partitions = Lists.partition(metricDataQueries, calculateSplitSize(metricDataQueries.size()));
@@ -284,12 +290,6 @@ public class MetricsMetadataHandler
                 splits.add(Split.newBuilder(makeSpillLocation(getSplitsRequest), makeEncryptionKey())
                         .add(MetricDataQuerySerDe.SERIALIZED_METRIC_DATA_QUERIES_FIELD_NAME, serializedMetricDataQueries)
                         .build());
-            }
-
-            String continuationToken = null;
-            if (result.getNextToken() != null &&
-                    !result.getNextToken().equalsIgnoreCase(listMetricsRequest.getNextToken())) {
-                continuationToken = result.getNextToken();
             }
 
             return new GetSplitsResponse(getSplitsRequest.getCatalogName(), splits, continuationToken);
