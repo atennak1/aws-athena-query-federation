@@ -34,6 +34,7 @@ import com.amazonaws.services.cloudwatch.model.GetMetricDataRequest;
 import com.amazonaws.services.cloudwatch.model.ListMetricsRequest;
 import com.amazonaws.services.cloudwatch.model.Metric;
 import com.amazonaws.services.cloudwatch.model.MetricDataQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +208,7 @@ public class MetricUtils
     public static AmazonCloudWatch getCloudWatchClient()
     {
         String crossRegion = System.getenv(CROSS_REGION);
-        if (crossRegion != null) {
+        if (StringUtils.isNotBlank(crossRegion)) {
             return AmazonCloudWatchClientBuilder.standard().withRegion(crossRegion).build();
         }
         else {
