@@ -44,7 +44,6 @@ import com.amazonaws.athena.connectors.cloudwatch.metrics.tables.MetricsTable;
 import com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table;
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
-import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.ListMetricsRequest;
 import com.amazonaws.services.cloudwatch.model.ListMetricsResult;
 import com.amazonaws.services.cloudwatch.model.Metric;

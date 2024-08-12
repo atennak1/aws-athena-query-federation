@@ -204,7 +204,8 @@ public class MetricUtils
         return "true".equals(System.getenv(INCLUDE_LINKED_ACCOUNTS_BY_DEFAULT));
     }
 
-    public static AmazonCloudWatch getCloudWatchClient() {
+    public static AmazonCloudWatch getCloudWatchClient()
+    {
         String crossRegion = System.getenv(CROSS_REGION);
         if (crossRegion != null) {
             return AmazonCloudWatchClientBuilder.standard().withRegion(crossRegion).build();
