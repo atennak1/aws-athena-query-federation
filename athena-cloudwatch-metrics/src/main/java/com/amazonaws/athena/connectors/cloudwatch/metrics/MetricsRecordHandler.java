@@ -32,7 +32,6 @@ import com.amazonaws.athena.connectors.cloudwatch.metrics.tables.Table;
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.AmazonAthenaClientBuilder;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
-import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.Dimension;
 import com.amazonaws.services.cloudwatch.model.GetMetricDataRequest;
 import com.amazonaws.services.cloudwatch.model.GetMetricDataResult;
@@ -100,7 +99,6 @@ public class MetricsRecordHandler
     //Used to handle throttling events by applying AIMD congestion control
     private final ThrottlingInvoker invoker;
 
-    private final AmazonS3 amazonS3;
     private final AmazonCloudWatch metrics;
 
     private final boolean includeLinkedAccountsByDefault;
@@ -110,14 +108,13 @@ public class MetricsRecordHandler
         this(AmazonS3ClientBuilder.defaultClient(),
                 AWSSecretsManagerClientBuilder.defaultClient(),
                 AmazonAthenaClientBuilder.defaultClient(),
-                AmazonCloudWatchClientBuilder.standard().withRegion("ap-southeast-1").build(), configOptions);
+                MetricUtils.getCloudWatchClient(), configOptions);
     }
 
     @VisibleForTesting
     protected MetricsRecordHandler(AmazonS3 amazonS3, AWSSecretsManager secretsManager, AmazonAthena athena, AmazonCloudWatch metrics, java.util.Map<String, String> configOptions)
     {
         super(amazonS3, secretsManager, athena, SOURCE_TYPE, configOptions);
-        this.amazonS3 = amazonS3;
         this.metrics = metrics;
         this.invoker = ThrottlingInvoker.newDefaultBuilder(EXCEPTION_FILTER, configOptions)
             .withInitialDelayMs(THROTTLING_INITIAL_DELAY)

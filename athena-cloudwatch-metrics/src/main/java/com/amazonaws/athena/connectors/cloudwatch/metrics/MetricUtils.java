@@ -26,6 +26,8 @@ import com.amazonaws.athena.connector.lambda.domain.predicate.Range;
 import com.amazonaws.athena.connector.lambda.domain.predicate.SortedRangeSet;
 import com.amazonaws.athena.connector.lambda.domain.predicate.ValueSet;
 import com.amazonaws.athena.connector.lambda.records.ReadRecordsRequest;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.Dimension;
 import com.amazonaws.services.cloudwatch.model.DimensionFilter;
 import com.amazonaws.services.cloudwatch.model.GetMetricDataRequest;
@@ -55,9 +57,10 @@ public class MetricUtils
 {
     private static final Logger logger = LoggerFactory.getLogger(MetricUtils.class);
 
-    //this is a format required by Cloudwatch Metrics
-    private static final String METRIC_ID = "m1";
-    //
+    //Optional Environment Variable for specific a cross region to fetch metrics from
+    private static final String CROSS_REGION = "cross_region";
+    //Optional Environment Variable for specifying whether to include metrics from other accounts by default
+    //(if queried account is a monitoring account)
     private static final String INCLUDE_LINKED_ACCOUNTS_BY_DEFAULT = "include_linked_accounts_by_default";
 
     private MetricUtils() {}
@@ -199,5 +202,15 @@ public class MetricUtils
     public static boolean isIncludeLinkedAccountsByDefault()
     {
         return "true".equals(System.getenv(INCLUDE_LINKED_ACCOUNTS_BY_DEFAULT));
+    }
+
+    public static AmazonCloudWatch getCloudWatchClient() {
+        String crossRegion = System.getenv(CROSS_REGION);
+        if (crossRegion != null) {
+            return AmazonCloudWatchClientBuilder.standard().withRegion(crossRegion).build();
+        }
+        else {
+            return AmazonCloudWatchClientBuilder.defaultClient();
+        }
     }
 }
